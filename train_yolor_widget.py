@@ -186,7 +186,7 @@ class WidgetFactory(dataprocess.CWidgetFactory):
     def __init__(self):
         dataprocess.CWidgetFactory.__init__(self)
         # Set the name of the process -> it must be the same as the one declared in the process factory class
-        self.name = "YoloRTrain"
+        self.name = "train_yolor"
 
     def create(self, param):
         # Create widget object

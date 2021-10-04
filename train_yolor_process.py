@@ -192,7 +192,7 @@ class ProcessFactory(dataprocess.CTaskFactory):
     def __init__(self):
         dataprocess.CTaskFactory.__init__(self)
         # Set process information as string here
-        self.info.name = "YoloRTrain"
+        self.info.name = "train_yolor"
         self.info.shortDescription = "Train YoloR object detection models"
         self.info.description = "Train YoloR object detection models." \
                                 "You Only Learn One Representation: Unified Network for Multiple Tasks"
