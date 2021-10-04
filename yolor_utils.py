@@ -20,10 +20,10 @@ from PIL import Image, ExifTags
 from torch.utils.data import Dataset
 from tqdm import tqdm
 
-from YoloRTrain.yolor.utils.general import xyxy2xywh, xywh2xyxy
-from YoloRTrain.yolor.utils.torch_utils import torch_distributed_zero_first
-from YoloRTrain.yolor.utils.datasets import random_perspective, augment_hsv, letterbox
-from YoloRTrain.yolor.utils.parse_config import parse_model_cfg
+from train_yolor.yolor.utils.general import xyxy2xywh, xywh2xyxy
+from train_yolor.yolor.utils.torch_utils import torch_distributed_zero_first
+from train_yolor.yolor.utils.datasets import random_perspective, augment_hsv, letterbox
+from train_yolor.yolor.utils.parse_config import parse_model_cfg
 import matplotlib.pyplot as plt
 import random
 

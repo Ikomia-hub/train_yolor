@@ -21,12 +21,12 @@ from ikomia.core.task import TaskParam
 from ikomia.dnn import datasetio, dnntrain
 
 import copy
-from YoloRTrain import train
+from train_yolor import train
 from datetime import datetime
 import os
 from pathlib import Path
 from torch.utils.tensorboard import SummaryWriter
-from YoloRTrain.yolor_utils import change_cfg
+from train_yolor.yolor_utils import change_cfg
 import logging
 # Your imports below
 
@@ -55,7 +55,7 @@ def init_logging(rank=-1):
 # - Class to handle the process parameters
 # - Inherits PyCore.CWorkflowTaskParam from Ikomia API
 # --------------------
-class YoloRTrainParam(TaskParam):
+class Param(TaskParam):
 
     def __init__(self):
         TaskParam.__init__(self)
@@ -89,7 +89,7 @@ class YoloRTrainParam(TaskParam):
 # - Class which implements the process
 # - Inherits PyCore.CWorkflowTask or derived from Ikomia API
 # --------------------
-class YoloRTrainProcess(dnntrain.TrainProcess):
+class TrainProcess(dnntrain.TrainProcess):
 
     def __init__(self, name, param):
         dnntrain.TrainProcess.__init__(self, name, param)
@@ -100,7 +100,7 @@ class YoloRTrainProcess(dnntrain.TrainProcess):
 
         # Create parameters class
         if param is None:
-            self.setParam(YoloRTrainParam())
+            self.setParam(Param())
         else:
             self.setParam(copy.deepcopy(param))
         self.stop_train = False
@@ -187,7 +187,7 @@ class YoloRTrainProcess(dnntrain.TrainProcess):
 # - Factory class to build process object
 # - Inherits PyDataProcess.CTaskFactory from Ikomia API
 # --------------------
-class YoloRTrainProcessFactory(dataprocess.CTaskFactory):
+class ProcessFactory(dataprocess.CTaskFactory):
 
     def __init__(self):
         dataprocess.CTaskFactory.__init__(self)
@@ -214,4 +214,4 @@ class YoloRTrainProcessFactory(dataprocess.CTaskFactory):
 
     def create(self, param=None):
         # Create process object
-        return YoloRTrainProcess(self.info.name, param)
+        return TrainProcess(self.info.name, param)

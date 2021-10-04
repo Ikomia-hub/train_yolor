@@ -18,7 +18,7 @@
 
 from ikomia import core, dataprocess
 from ikomia.utils import pyqtutils, qtconversion
-from YoloRTrain.YoloRTrain_process import YoloRTrainParam
+from train_yolor.train_yolor_process import Param
 
 #PyQt GUI framework
 from PyQt5.QtWidgets import *
@@ -28,13 +28,13 @@ from PyQt5.QtWidgets import *
 # - Class which implements widget associated with the process
 # - Inherits PyCore.CWorkflowTaskWidget from Ikomia API
 # --------------------
-class YoloRTrainWidget(core.CWorkflowTaskWidget):
+class Widget(core.CWorkflowTaskWidget):
 
     def __init__(self, param, parent):
         core.CWorkflowTaskWidget.__init__(self, parent)
 
         if param is None:
-            self.parameters = YoloRTrainParam()
+            self.parameters = Param()
         else:
             self.parameters = param
 
@@ -181,7 +181,7 @@ class YoloRTrainWidget(core.CWorkflowTaskWidget):
 # - Factory class to build process widget object
 # - Inherits PyDataProcess.CWidgetFactory from Ikomia API
 # --------------------
-class YoloRTrainWidgetFactory(dataprocess.CWidgetFactory):
+class WidgetFactory(dataprocess.CWidgetFactory):
 
     def __init__(self):
         dataprocess.CWidgetFactory.__init__(self)
@@ -190,4 +190,4 @@ class YoloRTrainWidgetFactory(dataprocess.CWidgetFactory):
 
     def create(self, param):
         # Create widget object
-        return YoloRTrainWidget(param, None)
+        return Widget(param, None)

@@ -10,16 +10,16 @@ import torch
 import torch.backends.cudnn as cudnn
 from numpy import random
 
-from YoloRTrain.utils.google_utils import attempt_load
-from YoloRTrain.utils.datasets import LoadStreams, LoadImages
-from YoloRTrain.utils.general import (
+from train_yolor.utils.google_utils import attempt_load
+from train_yolor.utils.datasets import LoadStreams, LoadImages
+from train_yolor.utils.general import (
     check_img_size, non_max_suppression, apply_classifier, scale_coords, xyxy2xywh, strip_optimizer)
-from YoloRTrain.utils.plots import plot_one_box
-from YoloRTrain.utils.torch_utils import select_device, load_classifier, time_synchronized
+from train_yolor.utils.plots import plot_one_box
+from train_yolor.utils.torch_utils import select_device, load_classifier, time_synchronized
 
-from YoloRTrain.models.models import *
-from YoloRTrain.utils.datasets import *
-from YoloRTrain.utils.general import *
+from train_yolor.models.models import *
+from train_yolor.utils.datasets import *
+from train_yolor.utils.general import *
 
 def load_classes(path):
     # Loads *.names file at 'path'

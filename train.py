@@ -21,20 +21,20 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
-from YoloRTrain.yolor.test import test # import test.py to get mAP after each epoch
+from train_yolor.yolor.test import test # import test.py to get mAP after each epoch
 
-from YoloRTrain.yolor.models.models import *
-from YoloRTrain.yolor.utils.autoanchor import check_anchors
-from YoloRTrain.yolor.utils.general import labels_to_class_weights, increment_path, labels_to_image_weights, init_seeds,\
+from train_yolor.yolor.models.models import *
+from train_yolor.yolor.utils.autoanchor import check_anchors
+from train_yolor.yolor.utils.general import labels_to_class_weights, increment_path, labels_to_image_weights, init_seeds,\
     fitness, fitness_p, fitness_r, fitness_ap50, fitness_ap, fitness_f, strip_optimizer, get_latest_run,\
     check_dataset, check_file, check_git_status, check_img_size, print_mutation, set_logging
 
-from YoloRTrain.yolor.utils.google_utils import attempt_download
-from YoloRTrain.yolor.utils.loss import compute_loss
-from YoloRTrain.yolor.utils.plots import plot_images, plot_labels, plot_results, plot_evolution
-from YoloRTrain.yolor.utils.torch_utils import ModelEMA, select_device, intersect_dicts, torch_distributed_zero_first
+from train_yolor.yolor.utils.google_utils import attempt_download
+from train_yolor.yolor.utils.loss import compute_loss
+from train_yolor.yolor.utils.plots import plot_images, plot_labels, plot_results, plot_evolution
+from train_yolor.yolor.utils.torch_utils import ModelEMA, select_device, intersect_dicts, torch_distributed_zero_first
 
-from YoloRTrain.yolor_utils import create_dataloader, split_train_test, change_cfg
+from train_yolor.yolor_utils import create_dataloader, split_train_test, change_cfg
 
 def train(data, save_dir, epochs, eval_period, batch_size, weights, cfg_file, hyp_file, device,img_size,ratio_split_train_test, tb_writer, stop, emit_progress,logger):
     total_batch_size = batch_size
