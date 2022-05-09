@@ -153,20 +153,19 @@ class TrainProcess(dnntrain.TrainProcess):
             self.hyp = Path(os.path.dirname(os.path.realpath(__file__))+"/yolor/data/hyp.scratch.640.yaml")
 
         # Tensorboard
-        tb_logdir = Path(self.getTensorboardLogDir() + "/" + str_datetime)
+        tb_logdir = os.path.join(core.config.main_cfg["tensorboard"]["log_uri"], str_datetime)
         tb_writer = SummaryWriter(tb_logdir)
 
-
         # image size
-        self.img_size = (param.cfg["train_img_size"],param.cfg["test_img_size"])
-        if not(self.problem):
+        self.img_size = (param.cfg["train_img_size"], param.cfg["test_img_size"])
+        if not self.problem:
             device = 'cuda' if torch.cuda.is_available() else 'cpu'
-            train.train(data=input.data, save_dir=self.output_folder, epochs = param.cfg["epochs"],
-                        eval_period = param.cfg["eval_period"],batch_size = param.cfg["batch_size"],
-                        weights = param.cfg["pretrain"], cfg_file = self.cfg,hyp_file = self.hyp,device = device,
-                        img_size = self.img_size,ratio_split_train_test = param.cfg["dataset_split_ratio"]/100,
-                        tb_writer = tb_writer, stop = self.get_stop, emit_progress = self.emitStepProgress,
-                        logger = logger)
+            train.train(data=input.data, save_dir=self.output_folder, epochs=param.cfg["epochs"],
+                        eval_period=param.cfg["eval_period"], batch_size=param.cfg["batch_size"],
+                        weights=param.cfg["pretrain"], cfg_file=self.cfg, hyp_file=self.hyp, device = device,
+                        img_size=self.img_size, ratio_split_train_test=param.cfg["dataset_split_ratio"]/100,
+                        tb_writer=tb_writer, stop=self.get_stop, emit_progress=self.emitStepProgress,
+                        logger=logger)
 
         # Call endTaskRun to finalize process
         self.endTaskRun()
