@@ -165,7 +165,7 @@ class TrainProcess(dnntrain.TrainProcess):
                         weights=param.cfg["pretrain"], cfg_file=self.cfg, hyp_file=self.hyp, device = device,
                         img_size=self.img_size, ratio_split_train_test=param.cfg["dataset_split_ratio"]/100,
                         tb_writer=tb_writer, stop=self.get_stop, emit_progress=self.emitStepProgress,
-                        logger=logger)
+                        logger=logger, log_metrics=self.log_metrics)
 
         # Call endTaskRun to finalize process
         self.endTaskRun()

@@ -21,12 +21,13 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
-from train_yolor.yolor.test import test # import test.py to get mAP after each epoch
+from train_yolor.yolor.test import test  # import test.py to get mAP after each epoch
 
 from train_yolor.yolor.models.models import *
 from train_yolor.yolor.utils.autoanchor import check_anchors
-from train_yolor.yolor.utils.general import labels_to_class_weights, increment_path, labels_to_image_weights, init_seeds,\
-    fitness, fitness_p, fitness_r, fitness_ap50, fitness_ap, fitness_f, strip_optimizer, get_latest_run,\
+from train_yolor.yolor.utils.general import labels_to_class_weights, increment_path, labels_to_image_weights, \
+    init_seeds, \
+    fitness, fitness_p, fitness_r, fitness_ap50, fitness_ap, fitness_f, strip_optimizer, get_latest_run, \
     check_dataset, check_file, check_git_status, check_img_size, print_mutation, set_logging
 
 from train_yolor.yolor.utils.google_utils import attempt_download
@@ -36,14 +37,16 @@ from train_yolor.yolor.utils.torch_utils import ModelEMA, select_device, interse
 
 from train_yolor.yolor_utils import create_dataloader, split_train_test, change_cfg
 
-def train(data, save_dir, epochs, eval_period, batch_size, weights, cfg_file, hyp_file, device,img_size,ratio_split_train_test, tb_writer, stop, emit_progress,logger):
+
+def train(data, save_dir, epochs, eval_period, batch_size, weights, cfg_file, hyp_file, device, img_size,
+          ratio_split_train_test, tb_writer, stop, emit_progress, logger, log_metrics):
     total_batch_size = batch_size
-    rank = -1 # DDP not implemented
+    rank = -1  # DDP not implemented
     # Directories
     wdir = save_dir / 'weights'
-    if not(os.path.isdir(save_dir)):
+    if not (os.path.isdir(save_dir)):
         os.mkdir(save_dir)
-    if not(os.path.isdir(wdir)):
+    if not (os.path.isdir(wdir)):
         os.mkdir(Path(wdir))  # make dir
 
     last = wdir / 'last.pt'
@@ -52,13 +55,13 @@ def train(data, save_dir, epochs, eval_period, batch_size, weights, cfg_file, hy
     cfg_file = str(cfg_file.__str__())
 
     # Configure
-    plots = True # create plots
+    plots = True  # create plots
     device = torch.device(device)
     cuda = device.type != 'cpu'
     init_seeds(2 + rank)
 
     nc = len(data['metadata']['category_names'].keys())
-    names = [v for k,v in data['metadata']['category_names'].items()]
+    names = [v for k, v in data['metadata']['category_names'].items()]
     single_cls = nc == 1
     cfg = check_file(cfg_file)
     assert len(names) == nc, '%g names found for nc=%g' % (len(names), nc)  # check
@@ -70,9 +73,9 @@ def train(data, save_dir, epochs, eval_period, batch_size, weights, cfg_file, hy
     workers = 0
     world_size = 1
     image_weights = None
-    train_data, test_data = split_train_test(data,ratio_split_train_test)
+    train_data, test_data = split_train_test(data, ratio_split_train_test)
     multi_scale = False
-    no_test = not(eval_period > 0)
+    no_test = not (eval_period > 0)
 
     # Image sizes
     gs = 64  # int(max(model.stride))  # grid size (max stride)
@@ -93,7 +96,6 @@ def train(data, save_dir, epochs, eval_period, batch_size, weights, cfg_file, hy
     mlc = np.concatenate(dataset.labels, 0)[:, 0].max()  # max label class
     nb = len(dataloader)  # number of batches
     assert mlc < nc, 'Label class %g exceeds nc=%g. Possible class labels are 0-%g' % (mlc, nc, nc - 1)
-
 
     # Model
     model = Darknet(cfg).to(device)  # create
@@ -167,7 +169,7 @@ def train(data, save_dir, epochs, eval_period, batch_size, weights, cfg_file, hy
                                        rank=rank, world_size=world_size, workers=workers)[0]  # testloader
 
     # Model parameters
-    hyp['cls'] *= nc /80  # scale coco-tuned hyp['cls'] to current dataset
+    hyp['cls'] *= nc / 80  # scale coco-tuned hyp['cls'] to current dataset
     model.nc = nc  # attach number of classes to model
     model.hyp = hyp  # attach hyperparameters to model
     model.gr = 1.0  # iou loss ratio (obj_loss = 1.0 or iou)
@@ -271,7 +273,7 @@ def train(data, save_dir, epochs, eval_period, batch_size, weights, cfg_file, hy
 
             # end batch ------------------------------------------------------------------------------------------------
         # end epoch ----------------------------------------------------------------------------------------------------
-        emit_progress() # Ikomia function to track the number of epochs done
+        emit_progress()  # Ikomia function to track the number of epochs done
         # Scheduler
         lr = [x['lr'] for x in optimizer.param_groups]  # for tensorboard
         scheduler.step()
@@ -283,17 +285,17 @@ def train(data, save_dir, epochs, eval_period, batch_size, weights, cfg_file, hy
                 ema.update_attr(model)
             final_epoch = epoch + 1 == epochs
             if not no_test or final_epoch:  # Calculate mAP
-                if (epoch+1) % eval_period == 0:
+                if (epoch + 1) % eval_period == 0:
                     results, maps, times = test(nc,
-                                                     names,
-                                                     batch_size=batch_size * 2,
-                                                     imgsz=imgsz_test,
-                                                     model=ema.ema.module if hasattr(ema.ema, 'module') else ema.ema,
-                                                     single_cls=single_cls,
-                                                     dataloader=testloader,
-                                                     save_dir=save_dir,
-                                                     plots=plots and final_epoch,
-                                                     log_imgs=0)
+                                                names,
+                                                batch_size=batch_size * 2,
+                                                imgsz=imgsz_test,
+                                                model=ema.ema.module if hasattr(ema.ema, 'module') else ema.ema,
+                                                single_cls=single_cls,
+                                                dataloader=testloader,
+                                                save_dir=save_dir,
+                                                plots=plots and final_epoch,
+                                                log_imgs=0)
 
             # Write
             with open(results_file, 'a') as f:
@@ -304,6 +306,9 @@ def train(data, save_dir, epochs, eval_period, batch_size, weights, cfg_file, hy
                     'metrics/precision', 'metrics/recall', 'metrics/mAP_0.5', 'metrics/mAP_0.5:0.95',
                     'val/box_loss', 'val/obj_loss', 'val/cls_loss',  # val loss
                     'x/lr0', 'x/lr1', 'x/lr2']  # params
+
+            log_metrics({k.replace(':', '_'): float(v) for k, v in zip(tags, list(mloss[:-1]) + list(results) + lr)},
+                        epochs)
 
             for x, tag in zip(list(mloss[:-1]) + list(results) + lr, tags):
                 if tb_writer:
@@ -318,13 +323,13 @@ def train(data, save_dir, epochs, eval_period, batch_size, weights, cfg_file, hy
             # Save last, best and delete
 
             if best_fitness == fi:
-                ckpt = {'model' : ema.ema.module.state_dict() if hasattr(ema.ema, 'module') else ema.ema.state_dict(),
-                        'names' : names
-                    }
+                ckpt = {'model': ema.ema.module.state_dict() if hasattr(ema.ema, 'module') else ema.ema.state_dict(),
+                        'names': names
+                        }
                 torch.save(ckpt, best)
                 del ckpt
         # end epoch ----------------------------------------------------------------------------------------------------
-    # end training
+        # end training
         ckpt = {'model': ema.ema.module.state_dict() if hasattr(ema.ema, 'module') else ema.ema.state_dict(),
                 'names': names
                 }
@@ -336,8 +341,3 @@ def train(data, save_dir, epochs, eval_period, batch_size, weights, cfg_file, hy
         logger.info('%g epochs completed in %.3f hours.\n' % (epoch - start_epoch + 1, (time.time() - t0) / 3600))
 
     torch.cuda.empty_cache()
-
-
-
-
-
