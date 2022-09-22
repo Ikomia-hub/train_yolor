@@ -194,7 +194,7 @@ class ProcessFactory(dataprocess.CTaskFactory):
         self.info.authors = "Chien-Yao Wang, I-Hau Yeh, Hong-Yuan Mark Liao"
         # relative path -> as displayed in Ikomia application process tree
         self.info.path = "Plugins/Python/Detection"
-        self.info.version = "1.0.0"
+        self.info.version = "1.0.1"
         self.info.iconPath = "icons/icon.png"
         self.info.article = "You Only Learn One Representation: Unified Network for Multiple Tasks"
         self.info.journal = "Arxiv"
