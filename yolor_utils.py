@@ -103,7 +103,7 @@ def split_train_test(ikDataset, ratio_split_train_test, seed=0):
     random.seed(seed)
     annoted_imgs = ikDataset['images']
     random.shuffle(annoted_imgs)
-    pivot = int((len(annoted_imgs) - 1) * ratio_split_train_test)
+    pivot = int(len(annoted_imgs) * ratio_split_train_test)
     return {'images':annoted_imgs[:pivot],'metadata':ikDataset['metadata']}, {'images':annoted_imgs[pivot:],'metadata':ikDataset['metadata']}
     # (train_data, test_data)
 
