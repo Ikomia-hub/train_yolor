@@ -13,6 +13,7 @@ def test(t, data_dict):
     params["epochs"] = 2
     params["batch_size"] = 1
     params["eval_period"] = 1
+    params["dataset_split_ratio"] = 50
     task.set_parameters(t, params)
     input_dataset.load(data_dict["datasets"]["detection"]["dataset_coco"])
     yield run_for_test(t)
