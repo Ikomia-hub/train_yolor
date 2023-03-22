@@ -71,7 +71,7 @@ class Param(TaskParam):
         self.cfg["eval_period"] = 5
         self.cfg["pretrain"] = ""
 
-    def setParamMap(self, param_map):
+    def set_values(self, param_map):
         self.cfg["model_name"] = param_map["model_name"]
         self.cfg["epochs"] = int(param_map["epochs"])
         self.cfg["batch_size"] = int(param_map["batch_size"])
@@ -95,16 +95,17 @@ class TrainProcess(dnntrain.TrainProcess):
         dnntrain.TrainProcess.__init__(self, name, param)
 
         # Create parameters class
+        self.out_folder = None
         if param is None:
-            self.setParam(Param())
+            self.set_param_object(Param())
         else:
-            self.setParam(copy.deepcopy(param))
+            self.set_param_object(copy.deepcopy(param))
         self.stop_train = False
 
-    def getProgressSteps(self):
+    def get_progress_steps(self):
         # Function returning the number of progress steps for this process
         # This is handled by the main progress bar of Ikomia application
-        param = self.getParam()
+        param = self.get_param_object()
         if param is not None:
             return param.cfg["epochs"]
         else:
@@ -112,14 +113,14 @@ class TrainProcess(dnntrain.TrainProcess):
 
     def run(self):
         # Core function of your process
-        # Call beginTaskRun for initialization
-        self.beginTaskRun()
+        # Call begin_task_run for initialization
+        self.begin_task_run()
         self.problem = False
         self.stop_train = False
         # Get parameters :
-        param = self.getParam()
+        param = self.get_param_object()
 
-        input = self.getInput(0)
+        input = self.get_input(0)
 
         # current datetime is used as folder name
         str_datetime = datetime.now().strftime("%d-%m-%YT%Hh%Mm%Ss")
@@ -130,8 +131,8 @@ class TrainProcess(dnntrain.TrainProcess):
             classes = [v for k,v in input.data['metadata']['category_names'].items() ]
 
         # output dir
-        self.output_folder = Path(param.cfg["output_folder"]+"/"+str_datetime)
-        self.output_folder.mkdir(parents=True, exist_ok=True)
+        self.out_folder = Path(param.cfg["output_folder"]) / str_datetime
+        self.out_folder.mkdir(parents=True, exist_ok=True)
 
         # cfg
         if os.path.isfile(param.cfg["custom_model"]):
@@ -140,7 +141,7 @@ class TrainProcess(dnntrain.TrainProcess):
             # get base cfg
             self.cfg = Path(os.path.dirname(os.path.realpath(__file__))+"/yolor/cfg/"+param.cfg["model_name"]+".cfg")
             model_name = param.cfg["model_name"]
-            cfg_dst = self.output_folder / (model_name + ".cfg")
+            cfg_dst = self.out_folder / (model_name + ".cfg")
             nc = len(classes)
             change_cfg(self.cfg.__str__(),nc,cfg_dst.__str__())
             self.cfg = cfg_dst
@@ -160,15 +161,15 @@ class TrainProcess(dnntrain.TrainProcess):
         self.img_size = (param.cfg["train_img_size"], param.cfg["test_img_size"])
         if not self.problem:
             device = 'cuda' if torch.cuda.is_available() else 'cpu'
-            train.train(data=input.data, save_dir=self.output_folder, epochs=param.cfg["epochs"],
+            train.train(data=input.data, save_dir=self.out_folder, epochs=param.cfg["epochs"],
                         eval_period=param.cfg["eval_period"], batch_size=param.cfg["batch_size"],
                         weights=param.cfg["pretrain"], cfg_file=self.cfg, hyp_file=self.hyp, device = device,
                         img_size=self.img_size, ratio_split_train_test=param.cfg["dataset_split_ratio"]/100,
-                        tb_writer=tb_writer, stop=self.get_stop, emit_progress=self.emitStepProgress,
+                        tb_writer=tb_writer, stop=self.get_stop, emit_progress=self.emit_step_progress,
                         logger=logger, log_metrics=self.log_metrics)
 
-        # Call endTaskRun to finalize process
-        self.endTaskRun()
+        # Call end_task_run to finalize process
+        self.end_task_run()
 
     def get_stop(self):
         return self.stop_train
@@ -188,20 +189,20 @@ class ProcessFactory(dataprocess.CTaskFactory):
         dataprocess.CTaskFactory.__init__(self)
         # Set process information as string here
         self.info.name = "train_yolor"
-        self.info.shortDescription = "Train YoloR object detection models"
+        self.info.short_description = "Train YoloR object detection models"
         self.info.description = "Train YoloR object detection models." \
                                 "You Only Learn One Representation: Unified Network for Multiple Tasks"
         self.info.authors = "Chien-Yao Wang, I-Hau Yeh, Hong-Yuan Mark Liao"
         # relative path -> as displayed in Ikomia application process tree
         self.info.path = "Plugins/Python/Detection"
         self.info.version = "1.0.1"
-        self.info.iconPath = "icons/icon.png"
+        self.info.icon_path = "icons/icon.png"
         self.info.article = "You Only Learn One Representation: Unified Network for Multiple Tasks"
         self.info.journal = "Arxiv"
         self.info.year = 2021
         self.info.license = "GPL-3.0 License"
         # URL of documentation
-        self.info.documentationLink = "https://arxiv.org/abs/2105.04206"
+        self.info.documentation_link = "https://arxiv.org/abs/2105.04206"
         # Code source repository
         self.info.repository = "https://github.com/WongKinYiu/yolor"
         # Keywords used for search
