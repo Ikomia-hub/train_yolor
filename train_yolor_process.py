@@ -59,30 +59,32 @@ class Param(TaskParam):
 
     def __init__(self):
         TaskParam.__init__(self)
+        self.cfg["model_name_or_path"] = ""
         self.cfg["model_name"] = "yolor_p6"
         self.cfg["epochs"] = 50
         self.cfg["batch_size"] = 8
-        self.cfg["train_img_size"] = 512
-        self.cfg["test_img_size"] = 512
+        self.cfg["train_imgsz"] = 512
+        self.cfg["test_imgsz"] = 512
         self.cfg["dataset_split_ratio"] = 90
-        self.cfg["custom_hyp_file"] = ""
+        self.cfg["config_hyper_param"] = ""
         self.cfg["output_folder"] = os.path.dirname(os.path.realpath(__file__)) + "/runs/"
-        self.cfg["custom_model"] = ""
+        self.cfg["config_model"] = ""
         self.cfg["eval_period"] = 5
-        self.cfg["pretrain"] = ""
+        self.cfg["model_path"] = ""
 
     def set_values(self, param_map):
+        self.cfg["model_name_or_path"] = param_map["model_name_or_path"]
         self.cfg["model_name"] = param_map["model_name"]
         self.cfg["epochs"] = int(param_map["epochs"])
         self.cfg["batch_size"] = int(param_map["batch_size"])
-        self.cfg["train_img_size"] = int(param_map["train_img_size"])
-        self.cfg["test_img_size"] = int(param_map["test_img_size"])
+        self.cfg["train_imgsz"] = int(param_map["train_imgsz"])
+        self.cfg["test_imgsz"] = int(param_map["test_imgsz"])
         self.cfg["dataset_split_ratio"] = int(param_map["dataset_split_ratio"])
-        self.cfg["custom_hyp_file"] = param_map["custom_hyp_file"]
+        self.cfg["config_hyper_param"] = param_map["config_hyper_param"]
         self.cfg["output_folder"] = param_map["output_folder"]
-        self.cfg["custom_model"] = param_map["custom_model"]
+        self.cfg["config_model"] = param_map["config_model"]
         self.cfg["eval_period"] = int(param_map["eval_period"])
-        self.cfg["pretrain"] = param_map["pretrain"]
+        self.cfg["model_path"] = param_map["model_path"]
 
 
 # --------------------
@@ -134,9 +136,15 @@ class TrainProcess(dnntrain.TrainProcess):
         self.out_folder = Path(param.cfg["output_folder"]) / str_datetime
         self.out_folder.mkdir(parents=True, exist_ok=True)
 
+        if param.cfg["model_name_or_path"] != "":
+                if os.path.isfile(param.cfg["model_name_or_path"]):
+                    param.cfg["model_path"] = param.cfg["model_name_or_path"]
+                else: 
+                    param.cfg["model_name"] = param.cfg["model_name_or_path"]
+
         # cfg
-        if os.path.isfile(param.cfg["custom_model"]):
-            self.cfg = Path(param.cfg["custom_model"])
+        if os.path.isfile(param.cfg["config_model"]):
+            self.cfg = Path(param.cfg["config_model"])
         else:
             # get base cfg
             self.cfg = Path(os.path.dirname(os.path.realpath(__file__))+"/yolor/cfg/"+param.cfg["model_name"]+".cfg")
@@ -146,10 +154,9 @@ class TrainProcess(dnntrain.TrainProcess):
             change_cfg(self.cfg.__str__(),nc,cfg_dst.__str__())
             self.cfg = cfg_dst
 
-
         # hyp
-        if os.path.isfile(param.cfg["custom_hyp_file"]):
-            self.hyp = Path(param.cfg["custom_hyp_file"])
+        if os.path.isfile(param.cfg["config_hyper_param"]):
+            self.hyp = Path(param.cfg["config_hyper_param"])
         else:
             self.hyp = Path(os.path.dirname(os.path.realpath(__file__))+"/yolor/data/hyp.scratch.640.yaml")
 
@@ -158,12 +165,12 @@ class TrainProcess(dnntrain.TrainProcess):
         tb_writer = SummaryWriter(tb_logdir)
 
         # image size
-        self.img_size = (param.cfg["train_img_size"], param.cfg["test_img_size"])
+        self.img_size = (param.cfg["train_imgsz"], param.cfg["test_imgsz"])
         if not self.problem:
             device = 'cuda' if torch.cuda.is_available() else 'cpu'
             train.train(data=input.data, save_dir=self.out_folder, epochs=param.cfg["epochs"],
                         eval_period=param.cfg["eval_period"], batch_size=param.cfg["batch_size"],
-                        weights=param.cfg["pretrain"], cfg_file=self.cfg, hyp_file=self.hyp, device = device,
+                        weights=param.cfg["model_path"], cfg_file=self.cfg, hyp_file=self.hyp, device = device,
                         img_size=self.img_size, ratio_split_train_test=param.cfg["dataset_split_ratio"]/100,
                         tb_writer=tb_writer, stop=self.get_stop, emit_progress=self.emit_step_progress,
                         logger=logger, log_metrics=self.log_metrics)

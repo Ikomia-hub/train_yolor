@@ -55,9 +55,9 @@ class Widget(core.CWorkflowTaskWidget):
 
         # Input size
         self.spin_train_img_size = pyqtutils.append_spin(self.grid_layout, "Train image size",
-                                                         self.parameters.cfg["train_img_size"])
+                                                         self.parameters.cfg["train_imgsz"])
         self.spin_test_img_size = pyqtutils.append_spin(self.grid_layout, "Test image size",
-                                                        self.parameters.cfg["test_img_size"])
+                                                        self.parameters.cfg["test_imgsz"])
 
         # Evaluation period
         self.spin_eval_period = pyqtutils.append_spin(self.grid_layout, "Eval period", self.parameters.cfg["eval_period"])
@@ -66,14 +66,14 @@ class Widget(core.CWorkflowTaskWidget):
         self.spin_train_test = pyqtutils.append_spin(self.grid_layout, "Train test percentage", self.parameters.cfg["dataset_split_ratio"])
 
         # Hyper-parameters
-        custom_hyp = self.parameters.cfg["custom_hyp_file"] != ""
+        custom_hyp = self.parameters.cfg["config_hyper_param"] != ""
         self.check_hyp = QCheckBox("Custom hyper-parameters")
         self.check_hyp.setChecked(custom_hyp)
         self.grid_layout.addWidget(self.check_hyp, self.grid_layout.rowCount(), 0, 1, 2)
         self.check_hyp.stateChanged.connect(self.on_custom_hyp_changed)
 
         self.label_hyp = QLabel("Hyper-parameters file")
-        self.browse_hyp_file = pyqtutils.BrowseFileWidget(path=self.parameters.cfg["custom_hyp_file"],
+        self.browse_hyp_file = pyqtutils.BrowseFileWidget(path=self.parameters.cfg["config_hyper_param"],
                                                           tooltip="Select file",
                                                           mode=QFileDialog.ExistingFile)
 
@@ -85,14 +85,14 @@ class Widget(core.CWorkflowTaskWidget):
         self.browse_hyp_file.setVisible(custom_hyp)
 
         # Custom Model
-        custom_model = self.parameters.cfg["custom_model"] != ""
+        custom_model = self.parameters.cfg["config_model"] != ""
         self.check_model = QCheckBox("Custom model")
         self.check_model.setChecked(custom_model)
         self.grid_layout.addWidget(self.check_model, self.grid_layout.rowCount(), 0, 1, 2)
-        self.check_model.stateChanged.connect(self.on_custom_model_changed)
+        self.check_model.stateChanged.connect(self.on_use_custom_model_changed)
 
         self.label_model = QLabel("Model config file")
-        self.browse_cfg_file = pyqtutils.BrowseFileWidget(path=self.parameters.cfg["custom_model"],
+        self.browse_cfg_file = pyqtutils.BrowseFileWidget(path=self.parameters.cfg["config_model"],
                                                           tooltip="Select file",
                                                           mode=QFileDialog.ExistingFile)
 
@@ -104,14 +104,14 @@ class Widget(core.CWorkflowTaskWidget):
         self.browse_cfg_file.setVisible(custom_model)
 
         # Pretrain
-        pretrain = self.parameters.cfg["pretrain"] != ""
+        pretrain = self.parameters.cfg["model_path"] != ""
         self.check_pretrain = QCheckBox("Pretrain")
         self.check_pretrain.setChecked(pretrain)
         self.grid_layout.addWidget(self.check_pretrain, self.grid_layout.rowCount(), 0, 1, 2)
         self.check_pretrain.stateChanged.connect(self.on_pretrain_changed)
 
         self.label_pretrain = QLabel("Pretrain weight file")
-        self.browse_pretrain_file = pyqtutils.BrowseFileWidget(path=self.parameters.cfg["pretrain"],
+        self.browse_pretrain_file = pyqtutils.BrowseFileWidget(path=self.parameters.cfg["model_path"],
                                                           tooltip="Select file",
                                                           mode=QFileDialog.ExistingFile)
 
@@ -138,7 +138,7 @@ class Widget(core.CWorkflowTaskWidget):
         self.label_hyp.setVisible(self.check_hyp.isChecked())
         self.browse_hyp_file.setVisible(self.check_hyp.isChecked())
 
-    def on_custom_model_changed(self, int):
+    def on_use_custom_model_changed(self, int):
         self.label_model.setVisible(self.check_model.isChecked())
         self.browse_cfg_file.setVisible(self.check_model.isChecked())
 
@@ -152,23 +152,23 @@ class Widget(core.CWorkflowTaskWidget):
         self.parameters.cfg["model_name"] = self.combo_model_name.currentText()
         self.parameters.cfg["epochs"] = self.spin_epochs.value()
         self.parameters.cfg["batch_size"] = self.spin_batch.value()
-        self.parameters.cfg["train_img_size"] = self.spin_train_img_size.value()
-        self.parameters.cfg["test_img_size"] = self.spin_test_img_size.value()
+        self.parameters.cfg["train_imgsz"] = self.spin_train_img_size.value()
+        self.parameters.cfg["test_imgsz"] = self.spin_test_img_size.value()
         self.parameters.cfg["eval_period"] = self.spin_eval_period.value()
         self.parameters.cfg["dataset_split_ratio"] = self.spin_train_test.value()
 
         if self.check_hyp.isChecked():
-            self.parameters.cfg["custom_hyp_file"] = self.browse_hyp_file.path
+            self.parameters.cfg["config_hyper_param"] = self.browse_hyp_file.path
         else:
-            self.parameters.cfg["custom_hyp_file"] = ""
+            self.parameters.cfg["config_hyper_param"] = ""
         if self.check_model.isChecked():
-            self.parameters.cfg["custom_model"] = self.browse_cfg_file.path
+            self.parameters.cfg["config_model"] = self.browse_cfg_file.path
         else:
-            self.parameters.cfg["custom_model"] = ""
+            self.parameters.cfg["config_model"] = ""
         if self.check_pretrain.isChecked():
-            self.parameters.cfg["pretrain"] = self.browse_pretrain_file.path
+            self.parameters.cfg["model_path"] = self.browse_pretrain_file.path
         else:
-            self.parameters.cfg["pretrain"] = ""
+            self.parameters.cfg["model_path"] = ""
 
         self.parameters.cfg["output_folder"] = self.browse_out_folder.path
 
