@@ -66,9 +66,9 @@ class Param(TaskParam):
         self.cfg["train_imgsz"] = 512
         self.cfg["test_imgsz"] = 512
         self.cfg["dataset_split_ratio"] = 90
-        self.cfg["config_hyper_param"] = ""
+        self.cfg["config_hyper_param_file"] = ""
         self.cfg["output_folder"] = os.path.dirname(os.path.realpath(__file__)) + "/runs/"
-        self.cfg["config_model"] = ""
+        self.cfg["config_model_file"] = ""
         self.cfg["eval_period"] = 5
         self.cfg["model_path"] = ""
 
@@ -80,9 +80,9 @@ class Param(TaskParam):
         self.cfg["train_imgsz"] = int(param_map["train_imgsz"])
         self.cfg["test_imgsz"] = int(param_map["test_imgsz"])
         self.cfg["dataset_split_ratio"] = int(param_map["dataset_split_ratio"])
-        self.cfg["config_hyper_param"] = param_map["config_hyper_param"]
+        self.cfg["config_hyper_param_file"] = param_map["config_hyper_param_file"]
         self.cfg["output_folder"] = param_map["output_folder"]
-        self.cfg["config_model"] = param_map["config_model"]
+        self.cfg["config_model_file"] = param_map["config_model_file"]
         self.cfg["eval_period"] = int(param_map["eval_period"])
         self.cfg["model_path"] = param_map["model_path"]
 
@@ -143,8 +143,8 @@ class TrainProcess(dnntrain.TrainProcess):
                     param.cfg["model_name"] = param.cfg["model_name_or_path"]
 
         # cfg
-        if os.path.isfile(param.cfg["config_model"]):
-            self.cfg = Path(param.cfg["config_model"])
+        if os.path.isfile(param.cfg["config_model_file"]):
+            self.cfg = Path(param.cfg["config_model_file"])
         else:
             # get base cfg
             self.cfg = Path(os.path.dirname(os.path.realpath(__file__))+"/yolor/cfg/"+param.cfg["model_name"]+".cfg")
@@ -155,8 +155,8 @@ class TrainProcess(dnntrain.TrainProcess):
             self.cfg = cfg_dst
 
         # hyp
-        if os.path.isfile(param.cfg["config_hyper_param"]):
-            self.hyp = Path(param.cfg["config_hyper_param"])
+        if os.path.isfile(param.cfg["config_hyper_param_file"]):
+            self.hyp = Path(param.cfg["config_hyper_param_file"])
         else:
             self.hyp = Path(os.path.dirname(os.path.realpath(__file__))+"/yolor/data/hyp.scratch.640.yaml")
 
