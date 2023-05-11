@@ -85,14 +85,14 @@ class Widget(core.CWorkflowTaskWidget):
         self.browse_hyp_file.setVisible(custom_hyp)
 
         # Custom Model
-        custom_model = self.parameters.cfg["config_model_file"] != ""
+        custom_model = self.parameters.cfg["config_file"] != ""
         self.check_model = QCheckBox("Custom model")
         self.check_model.setChecked(custom_model)
         self.grid_layout.addWidget(self.check_model, self.grid_layout.rowCount(), 0, 1, 2)
         self.check_model.stateChanged.connect(self.on_use_custom_model_changed)
 
         self.label_model = QLabel("Model config file")
-        self.browse_cfg_file = pyqtutils.BrowseFileWidget(path=self.parameters.cfg["config_model_file"],
+        self.browse_cfg_file = pyqtutils.BrowseFileWidget(path=self.parameters.cfg["config_file"],
                                                           tooltip="Select file",
                                                           mode=QFileDialog.ExistingFile)
 
@@ -104,14 +104,14 @@ class Widget(core.CWorkflowTaskWidget):
         self.browse_cfg_file.setVisible(custom_model)
 
         # Pretrain
-        pretrain = self.parameters.cfg["model_path"] != ""
+        pretrain = self.parameters.cfg["model_weight_file"] != ""
         self.check_pretrain = QCheckBox("Pretrain")
         self.check_pretrain.setChecked(pretrain)
         self.grid_layout.addWidget(self.check_pretrain, self.grid_layout.rowCount(), 0, 1, 2)
         self.check_pretrain.stateChanged.connect(self.on_pretrain_changed)
 
         self.label_pretrain = QLabel("Pretrain weight file")
-        self.browse_pretrain_file = pyqtutils.BrowseFileWidget(path=self.parameters.cfg["model_path"],
+        self.browse_pretrain_file = pyqtutils.BrowseFileWidget(path=self.parameters.cfg["model_weight_file"],
                                                           tooltip="Select file",
                                                           mode=QFileDialog.ExistingFile)
 
@@ -162,13 +162,13 @@ class Widget(core.CWorkflowTaskWidget):
         else:
             self.parameters.cfg["config_hyper_param_file"] = ""
         if self.check_model.isChecked():
-            self.parameters.cfg["config_model_file"] = self.browse_cfg_file.path
+            self.parameters.cfg["config_file"] = self.browse_cfg_file.path
         else:
-            self.parameters.cfg["config_model_file"] = ""
+            self.parameters.cfg["config_file"] = ""
         if self.check_pretrain.isChecked():
-            self.parameters.cfg["model_path"] = self.browse_pretrain_file.path
+            self.parameters.cfg["model_weight_file"] = self.browse_pretrain_file.path
         else:
-            self.parameters.cfg["model_path"] = ""
+            self.parameters.cfg["model_weight_file"] = ""
 
         self.parameters.cfg["output_folder"] = self.browse_out_folder.path
 

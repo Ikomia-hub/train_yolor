@@ -59,7 +59,6 @@ class Param(TaskParam):
 
     def __init__(self):
         TaskParam.__init__(self)
-        self.cfg["model_name_or_path"] = ""
         self.cfg["model_name"] = "yolor_p6"
         self.cfg["epochs"] = 50
         self.cfg["batch_size"] = 8
@@ -68,12 +67,11 @@ class Param(TaskParam):
         self.cfg["dataset_split_ratio"] = 90
         self.cfg["config_hyper_param_file"] = ""
         self.cfg["output_folder"] = os.path.dirname(os.path.realpath(__file__)) + "/runs/"
-        self.cfg["config_model_file"] = ""
+        self.cfg["config_file"] = ""
         self.cfg["eval_period"] = 5
-        self.cfg["model_path"] = ""
+        self.cfg["model_weight_file"] = ""
 
     def set_values(self, param_map):
-        self.cfg["model_name_or_path"] = param_map["model_name_or_path"]
         self.cfg["model_name"] = param_map["model_name"]
         self.cfg["epochs"] = int(param_map["epochs"])
         self.cfg["batch_size"] = int(param_map["batch_size"])
@@ -82,9 +80,9 @@ class Param(TaskParam):
         self.cfg["dataset_split_ratio"] = int(param_map["dataset_split_ratio"])
         self.cfg["config_hyper_param_file"] = param_map["config_hyper_param_file"]
         self.cfg["output_folder"] = param_map["output_folder"]
-        self.cfg["config_model_file"] = param_map["config_model_file"]
+        self.cfg["config_file"] = param_map["config_file"]
         self.cfg["eval_period"] = int(param_map["eval_period"])
-        self.cfg["model_path"] = param_map["model_path"]
+        self.cfg["model_weight_file"] = param_map["model_weight_file"]
 
 
 # --------------------
@@ -136,15 +134,9 @@ class TrainProcess(dnntrain.TrainProcess):
         self.out_folder = Path(param.cfg["output_folder"]) / str_datetime
         self.out_folder.mkdir(parents=True, exist_ok=True)
 
-        if param.cfg["model_name_or_path"] != "":
-                if os.path.isfile(param.cfg["model_name_or_path"]):
-                    param.cfg["model_path"] = param.cfg["model_name_or_path"]
-                else: 
-                    param.cfg["model_name"] = param.cfg["model_name_or_path"]
-
         # cfg
-        if os.path.isfile(param.cfg["config_model_file"]):
-            self.cfg = Path(param.cfg["config_model_file"])
+        if os.path.isfile(param.cfg["config_file"]):
+            self.cfg = Path(param.cfg["config_file"])
         else:
             # get base cfg
             self.cfg = Path(os.path.dirname(os.path.realpath(__file__))+"/yolor/cfg/"+param.cfg["model_name"]+".cfg")
@@ -170,7 +162,7 @@ class TrainProcess(dnntrain.TrainProcess):
             device = 'cuda' if torch.cuda.is_available() else 'cpu'
             train.train(data=input.data, save_dir=self.out_folder, epochs=param.cfg["epochs"],
                         eval_period=param.cfg["eval_period"], batch_size=param.cfg["batch_size"],
-                        weights=param.cfg["model_path"], cfg_file=self.cfg, hyp_file=self.hyp, device = device,
+                        weights=param.cfg["model_weight_file"], cfg_file=self.cfg, hyp_file=self.hyp, device = device,
                         img_size=self.img_size, ratio_split_train_test=param.cfg["dataset_split_ratio"]/100,
                         tb_writer=tb_writer, stop=self.get_stop, emit_progress=self.emit_step_progress,
                         logger=logger, log_metrics=self.log_metrics)
