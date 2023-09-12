@@ -45,8 +45,8 @@ wf = Workflow()
 coco = wf.add_task(name="dataset_coco")
 
 coco.set_parameters({
-    "json_file": "C:/Users/allan/OneDrive/Desktop/ik-desktop/Images/datasets/wgisd/coco_annotations/test_polygons_instances.json",
-    "image_folder": "C:/Users/allan/OneDrive/Desktop/ik-desktop/Images/datasets/wgisd/data",
+    "json_file": "path/to/json/annotation/file",
+    "image_folder": "path/to/image/folder",
     "task": "detection",
 }) 
 
@@ -91,8 +91,8 @@ wf = Workflow()
 coco = wf.add_task(name="dataset_coco")
 
 coco.set_parameters({
-    "json_file": "C:/Users/allan/OneDrive/Desktop/ik-desktop/Images/datasets/wgisd/coco_annotations/test_polygons_instances.json",
-    "image_folder": "C:/Users/allan/OneDrive/Desktop/ik-desktop/Images/datasets/wgisd/data",
+    "json_file": "path/to/json/annotation/file",
+    "image_folder": "path/to/image/folder",
     "task": "detection",
 }) 
 
